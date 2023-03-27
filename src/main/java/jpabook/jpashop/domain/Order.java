@@ -1,6 +1,8 @@
 package jpabook.jpashop.domain;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -13,6 +15,7 @@ import static javax.persistence.FetchType.*;
 @Entity
 @Table(name = "orders")     //테이블 이름을 orders로 지정한다.
 @Getter @Setter
+//@NoArgsConstructor(access= AccessLevel.PRIVATE)
 public class Order {
 
     @Id @GeneratedValue
@@ -53,5 +56,45 @@ public class Order {
     public void setDevlivery(Delivery delivery){    // order와 Delivery를 설정
         this.delivery = delivery;
         delivery.setOrder(this);
+    }
+//--------------------------------------------------------------------------------------------------------------------
+    //== 생성 메소드 ==//
+    public static Order createOrder(Member member, Delivery delivery, OrderItem... orderItems) {    // ...은 여러개를 넘길수 있는 문법이다.
+        Order order = new Order();
+        order.setMember(member);
+        order.setDelivery(delivery);
+        for (OrderItem orderItem : orderItems) {
+            order.addOrderItem(orderItem);
+        }
+        order.setStatus(OrderStatus.ORDER);         // 이게 orderStauts를 처음 상태로 order에 강제를 넣는 문법이다.
+        order.setOrderDate(LocalDateTime.now());    // 현재시간으로 잡는다. -> 주문시간 정보
+        return order;
+    }
+
+
+
+    //== 비즈니스 로직 ==//
+
+    //주문 취소
+    public void cancel() {
+        if (delivery.getStatus() == DeliveryStatus.COMP) {  // 만약 배송을 했으면 취소가 불가능하기 때문에 if문 사용
+            throw new IllegalStateException("이미 배송완료된 상품은 취소가 불가능합니다.");
+        }
+
+        this.setStatus(OrderStatus.CANCEL);
+        for (OrderItem orderItem : orderItems) {
+            orderItem.cancel();     // 오더 아이템에도 캔슬을 해줘야 한다. 오더 한번 주문을 할 때 한 회원이 두개를 주문할 수 도 있기 때문에
+        }
+    }
+
+    //== 죄회 로직 ==//
+
+    // 전체 주문가격 조회
+    public int getTotalPrice() {
+        int totalPrice = 0;
+        for (OrderItem orderItem : orderItems) {
+            totalPrice += orderItem.getTotalPrice();
+        }
+        return totalPrice;
     }
 }

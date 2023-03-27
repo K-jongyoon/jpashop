@@ -1,0 +1,20 @@
+# 테스트는 테스트안에 있는 resoures를 먼저 사용하기 때문에 test파일 안에 resoures를 만든다.
+# 하지만 spring-boot에서는 spring: 이것만 있으면 자동으로 메모리 모드로 실행한다.  // 사실 spring:이것도 없어도 됨 // 아무것도 없어도 됨
+spring:
+  datasource:
+    url: jdbc:h2:mem:test # 메모리 모드로 동작을 한다. // 메모리 모드를 사용하게 되면 DB가 내려가 있어도 테스트를 할 수 있다.
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # 자동으로 테이블을 만들어준다.  // spring-boot는 create-drop이 디폴트이다.
+    properties:
+      hibernate:
+        #        show_sql: true
+        format_sql: true
+
+logging.level:
+  org.hibernate.SQL: debug # 하이버네트워크가 생성하는 SQL이 디버그 모드로 로그를 확인할 수 있다.
+  org.hibernate.type: trace

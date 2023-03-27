@@ -25,6 +25,7 @@ class MemberServiceTest {
 
     @Autowired MemberService memberService;
     @Autowired MemberRepository memberRepository;
+
     @Test
     @Rollback(false)
     public void 회원가입() throws Exception {
@@ -50,7 +51,8 @@ class MemberServiceTest {
 
         // when
         memberService.join(member1);
-        memberService.join(member2);    // 위에 (expcted = IllegalStateException.class)를 하면 try문을 안써도 된다.
+        //memberService.join(member2);    // 위에 (expcted = IllegalStateException.class)를 하면 try문을 안써도 된다.
+
         // then
         fail("에외가 발생해야 된다.");
     }
